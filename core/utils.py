@@ -8,4 +8,7 @@ def custom_exception_handler(exception: APIException, context: dict) -> Response
         'message': exception.default_detail,
     }
 
+    if reason := getattr(exception, 'reason', None):
+        response['reason'] = reason
+
     return Response(response, status=exception.status_code)
