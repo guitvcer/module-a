@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'authorization',
+    'games',
 ]
 
 MIDDLEWARE = [
@@ -91,11 +93,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'authorization.authentication.Authentication',
     ],
-    'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler',
 }
 
 APPEND_SLASH = False
 
 VERSION = 1
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+}

@@ -10,7 +10,7 @@ class User(models.Model):
     username = models.CharField(max_length=60, unique=True, verbose_name='Username')
     password = models.CharField(max_length=2**16, verbose_name='Password')
 
-    is_deleted = models.BooleanField(default=False, verbose_name='Is Deleted?')
+    is_active = models.BooleanField(default=True, verbose_name='Is Active?')
 
     is_blocked = models.BooleanField(default=False, verbose_name='Is Blocked?')
     block_reason = models.CharField(
