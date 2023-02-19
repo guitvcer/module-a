@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'authorization',
+    'games',
 ]
 
 MIDDLEWARE = [
@@ -99,3 +101,7 @@ REST_FRAMEWORK = {
 APPEND_SLASH = False
 
 VERSION = 1
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+}
