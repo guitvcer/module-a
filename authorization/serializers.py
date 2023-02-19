@@ -31,8 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
         except User.DoesNotExist:
             raise exceptions.InvalidCredentials()
 
-        encoded_password = make_password(password)
-        if check_password(user.password, encoded_password):
+        if check_password(password, user.password):
             return user
 
         raise exceptions.InvalidCredentials()
