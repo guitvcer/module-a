@@ -26,7 +26,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get(self) -> User:
         username, password = self.validated_data['username'], self.validated_data['password']
-        user = User.objects.get(username=username)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise exceptions.InvalidCredentials()
 
         encoded_password = make_password(password)
         if check_password(user.password, encoded_password):
