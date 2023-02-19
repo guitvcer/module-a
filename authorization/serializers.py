@@ -32,7 +32,7 @@ class UserSerializer(serializers.ModelSerializer):
             raise exceptions.InvalidCredentials()
 
         if user.is_blocked:
-            raise exceptions.UserBlocked(user.block_reason or User.BlockReasonChoices.BY_ADMIN)
+            raise exceptions.UserBlocked(user.block_reason)
 
         if check_password(password, user.password):
             return user

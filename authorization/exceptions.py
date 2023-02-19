@@ -1,5 +1,7 @@
 from rest_framework.exceptions import APIException
 
+from .models import User
+
 
 class UserAlreadyExists(APIException):
     status_code = 400
@@ -18,5 +20,5 @@ class UserBlocked(APIException):
     default_detail = 'User blocked'
     default_code = 'user_blocked'
 
-    def __init__(self, reason: str) -> None:
-        self.reason = reason
+    def __init__(self, reason: str | None) -> None:
+        self.reason = reason or User.BlockReasonChoices.BY_ADMIN
