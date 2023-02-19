@@ -96,3 +96,5 @@ REST_FRAMEWORK = {
 }
 
 APPEND_SLASH = False
+
+VERSION = 1
