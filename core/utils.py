@@ -4,8 +4,8 @@ from rest_framework.response import Response
 
 def custom_exception_handler(exception: APIException, context: dict) -> Response:
     response = {
-        'status': exception.default_code,
-        'message': exception.default_detail,
+        'status': getattr(exception, 'default_code', 500),
+        'message': getattr(exception, 'default_detail', 'Internal Server Error'),
     }
 
     if reason := getattr(exception, 'reason', None):
