@@ -29,6 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.get(username=username)
 
         encoded_password = make_password(password)
-        check_password(user.password, encoded_password)
+        if check_password(user.password, encoded_password):
+            return user
 
-        return user
+        raise exceptions.InvalidCredentials()
