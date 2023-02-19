@@ -1,0 +1,30 @@
+version: '3.8'
+
+x-environment-vars: &environment-vars
+  DEBUG: "true"
+  PYTHONUNBUFFERED: 1
+  PYTHONIOENCODING: utf-8
+  TERM: linux
+
+  DATABASE_URL: postgresql://postgres@module_a_db:5432/postgres
+
+services:
+  module_a:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: worldskills_module_a
+    environment:
+      <<: *environment-vars
+    volumes:
+      - .:/proj
+    depends_on:
+      - module_a_db
+    command: python manage.py runserver 0.0.0.0:8000
+    stdin_open: true
+    tty: true
+
+  module_a_db:
+    image: postgres:15-bullseye
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
