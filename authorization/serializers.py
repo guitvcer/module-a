@@ -1,6 +1,8 @@
+import django.db.utils
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import serializers
 
+from . import exceptions
 from .models import User
 
 
@@ -15,7 +17,10 @@ class UserSerializer(serializers.ModelSerializer):
     def save(self) -> User:
         username, password = self.validated_data['username'], self.validated_data['password']
         encoded_password = make_password(password)
-        user = User.objects.create(username=username, password=encoded_password)
+        try:
+            user = User.objects.create(username=username, password=encoded_password)
+        except django.db.utils.IntegrityError:
+            raise exceptions.UserAlreadyExists()
 
         return user
 
