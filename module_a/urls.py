@@ -7,3 +7,5 @@ urlpatterns = [
     path(f'api/v{settings.VERSION}/games/', include('games.urls')),
     path('admin/', admin.site.urls),
 ]
+
+handler404 = 'module_a.views.handler404'
