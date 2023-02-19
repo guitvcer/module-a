@@ -38,4 +38,4 @@ class SignInView(APIView):
             'token': str(refresh_token),
         }
 
-        return Response(response, status=201)
+        return Response(response, status=status.HTTP_200_OK)
