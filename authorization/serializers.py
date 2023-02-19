@@ -31,6 +31,9 @@ class UserSerializer(serializers.ModelSerializer):
         except User.DoesNotExist:
             raise exceptions.InvalidCredentials()
 
+        if user.is_blocked:
+            raise exceptions.UserBlocked(user.block_reason or User.BlockReasonChoices.BY_ADMIN)
+
         if check_password(password, user.password):
             return user
 
