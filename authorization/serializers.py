@@ -1,4 +1,4 @@
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import serializers
 
 from .models import User
@@ -14,7 +14,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     def save(self) -> User:
         username, password = self.validated_data['username'], self.validated_data['password']
-        encrypted_password = make_password(password)
-        user = User.objects.create(username=username, password=encrypted_password)
+        encoded_password = make_password(password)
+        user = User.objects.create(username=username, password=encoded_password)
+
+        return user
+
+    def get(self) -> User:
+        username, password = self.validated_data['username'], self.validated_data['password']
+        user = User.objects.get(username=username)
+
+        encoded_password = make_password(password)
+        check_password(user.password, encoded_password)
 
         return user
