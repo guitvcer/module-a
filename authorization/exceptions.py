@@ -11,3 +11,12 @@ class InvalidCredentials(APIException):
     status_code = 401
     default_detail = 'Wrong username or password'
     default_code = 'invalid'
+
+
+class UserBlocked(APIException):
+    status_code = 403
+    default_detail = 'User blocked'
+    default_code = 'user_blocked'
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
