@@ -1,9 +1,11 @@
-from rest_framework.exceptions import APIException, ValidationError
+from rest_framework import exceptions
 from rest_framework.response import Response
 
+from authorization.exceptions import NotAuthenticated
 
-def custom_exception_handler(exception: APIException, context: dict) -> Response:
-    if isinstance(exception, ValidationError):
+
+def custom_exception_handler(exception: exceptions.APIException, context: dict) -> Response:
+    if isinstance(exception, exceptions.ValidationError):
         violations = {
             field: {
                 'message': error_details[0]['message'],
@@ -14,6 +16,12 @@ def custom_exception_handler(exception: APIException, context: dict) -> Response
             'status': 'invalid',
             'message': 'Request body is not valid.',
             'violations': violations,
+        }
+    elif isinstance(exception, exceptions.NotAuthenticated):
+        exception = NotAuthenticated()
+        response = {
+            'status': exception.default_code,
+            'message': exception.default_detail,
         }
     else:
         response = {
