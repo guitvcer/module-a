@@ -28,3 +28,9 @@ class NotAuthenticated(APIException):
     status_code = 401
     default_detail = 'unauthenticated'
     default_code = 'Missing token'
+
+
+class InvalidToken(APIException):
+    status_code = 401
+    default_detail = 'unauthenticated'
+    default_code = 'Invalid token'

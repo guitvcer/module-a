@@ -1,8 +1,9 @@
 from rest_framework import exceptions
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import InvalidToken as RestInvalidToken
 
 from core.exceptions import ValidationError
-from authorization.exceptions import NotAuthenticated
+from authorization.exceptions import InvalidToken, NotAuthenticated
 
 
 def custom_exception_handler(exception: exceptions.APIException, context: dict) -> Response:
@@ -10,6 +11,8 @@ def custom_exception_handler(exception: exceptions.APIException, context: dict) 
         exception = ValidationError(exception.get_full_details())
     elif isinstance(exception, exceptions.NotAuthenticated):
         exception = NotAuthenticated()
+    elif isinstance(exception, RestInvalidToken):
+        exception = InvalidToken()
 
     response = {
         'status': getattr(exception, 'default_code', 'internal_server_error'),
