@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import InvalidToken as RestInvalidToken
@@ -5,8 +7,12 @@ from rest_framework_simplejwt.exceptions import InvalidToken as RestInvalidToken
 from core.exceptions import ValidationError
 from authorization.exceptions import InvalidToken, NotAuthenticated
 
+LOGGER = logging.getLogger(__name__)
+
 
 def custom_exception_handler(exception: exceptions.APIException, context: dict) -> Response:
+    LOGGER.exception(exception)
+
     if isinstance(exception, exceptions.ValidationError):
         exception = ValidationError(exception.get_full_details())
     elif isinstance(exception, exceptions.NotAuthenticated):
