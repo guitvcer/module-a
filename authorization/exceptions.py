@@ -22,3 +22,15 @@ class UserBlocked(APIException):
 
     def __init__(self, reason: str | None) -> None:
         self.reason = reason or User.BlockReasonChoices.BY_ADMIN
+
+
+class NotAuthenticated(APIException):
+    status_code = 401
+    default_detail = 'unauthenticated'
+    default_code = 'Missing token'
+
+
+class InvalidToken(APIException):
+    status_code = 401
+    default_detail = 'unauthenticated'
+    default_code = 'Invalid token'

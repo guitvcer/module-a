@@ -1,27 +1,27 @@
-from rest_framework.exceptions import APIException, ValidationError
+from rest_framework import exceptions
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import InvalidToken as RestInvalidToken
+
+from core.exceptions import ValidationError
+from authorization.exceptions import InvalidToken, NotAuthenticated
 
 
-def custom_exception_handler(exception: APIException, context: dict) -> Response:
-    if isinstance(exception, ValidationError):
-        violations = {
-            field: {
-                'message': error_details[0]['message'],
-            }
-            for field, error_details in exception.get_full_details().items()
-        }
-        response = {
-            'status': 'invalid',
-            'message': 'Request body is not valid.',
-            'violations': violations,
-        }
-    else:
-        response = {
-            'status': getattr(exception, 'default_code', 'internal_server_error'),
-            'message': getattr(exception, 'default_detail', 'Internal Server Error'),
-        }
+def custom_exception_handler(exception: exceptions.APIException, context: dict) -> Response:
+    if isinstance(exception, exceptions.ValidationError):
+        exception = ValidationError(exception.get_full_details())
+    elif isinstance(exception, exceptions.NotAuthenticated):
+        exception = NotAuthenticated()
+    elif isinstance(exception, RestInvalidToken):
+        exception = InvalidToken()
+
+    response = {
+        'status': getattr(exception, 'default_code', 'internal_server_error'),
+        'message': getattr(exception, 'default_detail', 'Internal Server Error'),
+    }
 
     if reason := getattr(exception, 'reason', None):
         response['reason'] = reason
+    if violations := getattr(exception, 'violations', None):
+        response['violations'] = violations
 
     return Response(response, status=getattr(exception, 'status_code', 500))
