@@ -8,6 +8,7 @@ from .models import Game
 class GameSerializer(serializers.ModelSerializer):
     title = serializers.CharField(min_length=3, max_length=60)
     slug = serializers.CharField(required=False)
+    upload_timestamp = serializers.DateTimeField(source='created_at')
 
     class Meta:
         model = Game
@@ -18,6 +19,7 @@ class GameSerializer(serializers.ModelSerializer):
             'description',
             'version',
             'thumbnail',
+            'upload_timestamp',
         )
 
     def save(self, *args, **kwargs) -> Game:
