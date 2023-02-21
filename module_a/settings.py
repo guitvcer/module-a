@@ -113,4 +113,4 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
 
-DEFAULT_GAME_THUMBNAIL_URL = os.path.join(MEDIA_URL, 'games', 'default.png')
+DEFAULT_GAME_THUMBNAIL_URL = 'games/default.png'
