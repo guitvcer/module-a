@@ -20,8 +20,7 @@ class Game(models.Model):
     source = models.FileField(
         upload_to=_directory_path, verbose_name='Source Code', null=True)
     thumbnail = models.ImageField(
-        upload_to=_directory_path, verbose_name='Thumbnail',
-        default=settings.DEFAULT_GAME_THUMBNAIL_URL)
+        upload_to=_directory_path, verbose_name='Thumbnail', null=True)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
 

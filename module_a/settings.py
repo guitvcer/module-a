@@ -112,5 +112,3 @@ VERSION = 1
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
-
-DEFAULT_GAME_THUMBNAIL_URL = 'games/default.png'
