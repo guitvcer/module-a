@@ -20,7 +20,7 @@ class CreateGameAPIView(generics.ListCreateAPIView):
         return super().create(request)
 
     def get_queryset(self) -> QuerySet:
-        return Game.objects.all()
+        return Game.objects.filter(version__gte=1)
 
     def get_serializer_class(self) -> GameSerializer:
         match self.request.method:
