@@ -5,3 +5,4 @@ djangorestframework==3.14.*
 djangorestframework-simplejwt[crypto]==5.2.*
 
 psycopg2-binary
+pillow
