@@ -8,7 +8,7 @@ from .models import Game
 class GameSerializer(serializers.ModelSerializer):
     title = serializers.CharField(min_length=3, max_length=60)
     slug = serializers.CharField(required=False)
-    upload_timestamp = serializers.DateTimeField(source='created_at')
+    upload_timestamp = serializers.DateTimeField(source='created_at', required=False)
 
     class Meta:
         model = Game
