@@ -93,6 +93,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL)
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -109,3 +112,5 @@ VERSION = 1
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
+
+DEFAULT_GAME_THUMBNAIL_URL = os.path.join(MEDIA_URL, 'games', 'default.png')
