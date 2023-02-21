@@ -5,10 +5,39 @@ from .exceptions import GameAlreadyExists
 from .models import Game
 
 
-class GameSerializer(serializers.ModelSerializer):
+class CreateGameSerializer(serializers.ModelSerializer):
     title = serializers.CharField(min_length=3, max_length=60)
     slug = serializers.CharField(required=False)
-    upload_timestamp = serializers.DateTimeField(source='created_at', required=False)
+
+    class Meta:
+        model = Game
+        fields = (
+            'author',
+            'slug',
+            'title',
+            'description',
+            'version',
+        )
+
+    @property
+    def data(self):
+        _data = super().data
+        fields = {'title', 'description'}
+        return {
+            field: value
+            for field, value in _data.items()
+            if field in fields
+        }
+
+    def save(self, *args, **kwargs) -> Game:
+        try:
+            return super().save(*args, **kwargs)
+        except IntegrityError:
+            raise GameAlreadyExists()
+
+
+class GetGameSerializer(serializers.ModelSerializer):
+    upload_timestamp = serializers.DateTimeField(source='created_at')
 
     class Meta:
         model = Game
@@ -21,9 +50,3 @@ class GameSerializer(serializers.ModelSerializer):
             'thumbnail',
             'upload_timestamp',
         )
-
-    def save(self, *args, **kwargs) -> Game:
-        try:
-            return super().save(*args, **kwargs)
-        except IntegrityError:
-            raise GameAlreadyExists()
