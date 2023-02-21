@@ -11,7 +11,14 @@ class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ('author', 'slug', 'title', 'description', 'version')
+        fields = (
+            'author',
+            'slug',
+            'title',
+            'description',
+            'version',
+            'thumbnail',
+        )
 
     def save(self, *args, **kwargs) -> Game:
         try:
