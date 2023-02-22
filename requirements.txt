@@ -3,6 +3,7 @@ dj-database-url==1.2.*
 
 djangorestframework==3.14.*
 djangorestframework-simplejwt[crypto]==5.2.*
+djangorestframework-camel-case==1.4.*
 
 psycopg2-binary
 pillow
