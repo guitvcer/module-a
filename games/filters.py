@@ -11,6 +11,8 @@ class GamesOrderingFilter(OrderingFilter):
     def get_ordering(self, request: Request, queryset: QuerySet,
                      view: APIView) -> tuple[str, ...] | list[str]:
 
+        """For uploaddate -> uploadTimestamp map"""
+
         params = request.query_params.get(self.ordering_param)
         default_ordering = self.get_default_ordering(view)
         if not params:
@@ -32,6 +34,8 @@ class GamesOrderingFilter(OrderingFilter):
     def remove_invalid_fields(self, queryset: QuerySet, fields: list[str],
                               view: APIView, request: Request) -> list[str]:
 
+        """Put away ordering by '-'"""
+
         valid_fields = [
             item[0]
             for item in self.get_valid_fields(queryset, view, {'request': request})
@@ -40,6 +44,8 @@ class GamesOrderingFilter(OrderingFilter):
         return [term for term in fields if term in valid_fields]
 
     def filter_queryset(self, request: Request, queryset: QuerySet, view: APIView) -> QuerySet:
+        """Reverse queryset if sort_dir == 'desc'"""
+
         queryset = super().filter_queryset(request, queryset, view)
         direction = request.query_params.get(self.order_direction_param)
         if direction == 'desc':
