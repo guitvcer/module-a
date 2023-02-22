@@ -93,6 +93,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_URL)
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -100,6 +103,7 @@ REST_FRAMEWORK = {
         'authorization.authentication.Authentication',
     ],
     'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler',
+    'ORDERING_PARAM': 'sort_by',
 }
 
 APPEND_SLASH = False
@@ -109,3 +113,5 @@ VERSION = 1
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
+
+ORDER_DIRECTION_PARAM = 'sort_dir'

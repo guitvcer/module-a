@@ -1,26 +1,31 @@
-from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from authorization.permissions import IsAuthenticated
-from .serializers import GameSerializer
+from . import serializers
+from .filters import GamesOrderingFilter
+from .models import Game
+from .paginations import GamePagination
+from .permissions import CRUDPermission
+
+GameSerializer = type[serializers.CreateGameSerializer | serializers.GetGameSerializer]
 
 
-class CreateGameAPIView(CreateAPIView):
-    serializer_class = GameSerializer
-    permission_classes = (IsAuthenticated, )
+class CreateGameAPIView(generics.ListCreateAPIView):
+    pagination_class = GamePagination
+    permission_classes = (CRUDPermission, )
+    filter_backends = (GamesOrderingFilter, )
+    ordering = ('title', )
+    ordering_fields = ('title', 'description', 'uploaddate')
+    queryset = Game.objects.filter(version__gte=1)
 
     def create(self, request: Request) -> Response:
-        data = request.data
-        data['author'] = request.user.id
+        request.data['author'] = request.user.id
+        return super().create(request)
 
-        serializer = self.serializer_class(data=data)
-        serializer.is_valid(raise_exception=True)
-        game = serializer.save()
-
-        response = {
-            'status': 'success',
-            'slug': game.slug,
-        }
-        return Response(response, status=status.HTTP_201_CREATED)
+    def get_serializer_class(self) -> GameSerializer:
+        match self.request.method:
+            case 'GET':
+                return serializers.GetGameSerializer
+            case 'POST':
+                return serializers.CreateGameSerializer
