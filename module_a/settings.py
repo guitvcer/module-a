@@ -112,7 +112,7 @@ REST_FRAMEWORK = {
         "djangorestframework_camel_case.parser.CamelCaseJSONParser",
     ),
     'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler',
-    'ORDERING_PARAM': 'sort_by',
+    'ORDERING_PARAM': 'sortBy',
 }
 
 APPEND_SLASH = False
@@ -123,4 +123,4 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
 
-ORDER_DIRECTION_PARAM = 'sort_dir'
+ORDER_DIRECTION_PARAM = 'sortDir'
