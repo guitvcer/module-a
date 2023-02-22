@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 from . import serializers
 from .filters import GamesOrderingFilter
@@ -11,7 +12,7 @@ from .permissions import CRUDPermission
 GameSerializer = type[serializers.CreateGameSerializer | serializers.GetGameSerializer]
 
 
-class CreateGameAPIView(generics.ListCreateAPIView):
+class GameViewSet(ModelViewSet):
     pagination_class = GamePagination
     permission_classes = (CRUDPermission, )
     filter_backends = (GamesOrderingFilter, )
@@ -24,8 +25,8 @@ class CreateGameAPIView(generics.ListCreateAPIView):
         return super().create(request)
 
     def get_serializer_class(self) -> GameSerializer:
-        match self.request.method:
-            case 'GET':
+        match self.action:
+            case 'list':
                 return serializers.GetGameSerializer
-            case 'POST':
+            case 'create':
                 return serializers.CreateGameSerializer
