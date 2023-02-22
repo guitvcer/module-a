@@ -113,3 +113,5 @@ VERSION = 1
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
+
+ORDER_DIRECTION_PARAM = 'sort_dir'
