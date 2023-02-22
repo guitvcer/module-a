@@ -1,5 +1,5 @@
-from django.db.models import QuerySet
 from rest_framework import generics
+from rest_framework.filters import OrderingFilter
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -14,13 +14,13 @@ GameSerializer = type[serializers.CreateGameSerializer | serializers.GetGameSeri
 class CreateGameAPIView(generics.ListCreateAPIView):
     pagination_class = GamePagination
     permission_classes = (CRUDPermission, )
+    filter_backends = (OrderingFilter, )
+    ordering = ('title', )
+    queryset = Game.objects.filter(version__gte=1)
 
     def create(self, request: Request) -> Response:
         request.data['author'] = request.user.id
         return super().create(request)
-
-    def get_queryset(self) -> QuerySet:
-        return Game.objects.filter(version__gte=1)
 
     def get_serializer_class(self) -> GameSerializer:
         match self.request.method:

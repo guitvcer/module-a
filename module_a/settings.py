@@ -103,6 +103,7 @@ REST_FRAMEWORK = {
         'authorization.authentication.Authentication',
     ],
     'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler',
+    'ORDERING_PARAM': 'sort_by',
 }
 
 APPEND_SLASH = False
