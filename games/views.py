@@ -16,6 +16,7 @@ class CreateGameAPIView(generics.ListCreateAPIView):
     permission_classes = (CRUDPermission, )
     filter_backends = (OrderingFilter, )
     ordering = ('title', )
+    ordering_fields = ('title', 'description', 'uploaddate')
     queryset = Game.objects.filter(version__gte=1)
 
     def create(self, request: Request) -> Response:
