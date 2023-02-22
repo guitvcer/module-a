@@ -8,6 +8,27 @@ from rest_framework.views import APIView
 class GamesOrderingFilter(OrderingFilter):
     order_direction_param = settings.ORDER_DIRECTION_PARAM
 
+    def get_ordering(self, request: Request, queryset: QuerySet,
+                     view: APIView) -> tuple[str, ...] | list[str]:
+
+        params = request.query_params.get(self.ordering_param)
+        default_ordering = self.get_default_ordering(view)
+        if not params:
+            return default_ordering
+
+        fields = [self._map_param(param.strip()) for param in params.split(',')]
+        ordering = self.remove_invalid_fields(queryset, fields, view, request)
+        if ordering:
+            return ordering
+
+        return default_ordering
+
+    def _map_param(self, param: str) -> str:
+        if param == 'uploaddate':
+            return 'uploadTimestamp'
+
+        return param
+
     def remove_invalid_fields(self, queryset: QuerySet, fields: list[str],
                               view: APIView, request: Request) -> list[str]:
 
