@@ -40,6 +40,13 @@ class CreateGameSerializer(serializers.ModelSerializer):
 class ListGameSerializer(serializers.ModelSerializer):
     upload_timestamp = serializers.DateTimeField(source='created_at')
 
+    def to_representation(self, game: Game) -> dict:
+        response = super().to_representation(game)
+        if game.thumbnail:
+            response['thumbnail'] = game.thumbnail.url
+
+        return response
+
     class Meta:
         model = Game
         fields = (
@@ -62,6 +69,13 @@ class RetrieveGameSerializer(serializers.ModelSerializer):
             'slug': game.slug,
             'version': game.version,
         })
+
+    def to_representation(self, game: Game) -> dict:
+        response = super().to_representation(game)
+        if game.thumbnail:
+            response['thumbnail'] = game.thumbnail.url
+
+        return response
 
     class Meta:
         model = Game
