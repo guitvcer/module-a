@@ -1,5 +1,6 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from . import serializers
@@ -8,7 +9,11 @@ from .models import Game
 from .paginations import GamePagination
 from .permissions import CRUDPermission
 
-GameSerializer = type[serializers.CreateGameSerializer | serializers.GetGameSerializer]
+GameSerializer = type[
+    serializers.CreateGameSerializer |
+    serializers.ListGameSerializer |
+    serializers.RetrieveGameSerializer
+]
 
 
 class GameViewSet(ModelViewSet):
@@ -25,8 +30,14 @@ class GameViewSet(ModelViewSet):
         return super().create(request)
 
     def get_serializer_class(self) -> GameSerializer:
-        match self.action:
-            case 'list' | 'retrieve':
-                return serializers.GetGameSerializer
-            case 'create':
-                return serializers.CreateGameSerializer
+        action_serializer_class_map = {
+            'list': serializers.ListGameSerializer,
+            'retrieve': serializers.RetrieveGameSerializer,
+            'create': serializers.CreateGameSerializer,
+        }
+
+        return action_serializer_class_map[self.action]
+
+
+class SourceGameView(APIView):
+    pass
