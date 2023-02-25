@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from django.urls import reverse_lazy
 from rest_framework import serializers
 
 from .exceptions import GameAlreadyExists
@@ -36,17 +37,44 @@ class CreateGameSerializer(serializers.ModelSerializer):
             raise GameAlreadyExists()
 
 
-class GetGameSerializer(serializers.ModelSerializer):
+_get_game_serializer_fields = (
+    'author',
+    'slug',
+    'title',
+    'description',
+    'version',
+    'thumbnail',
+    'upload_timestamp',
+)
+
+
+class ListGameSerializer(serializers.ModelSerializer):
     upload_timestamp = serializers.DateTimeField(source='created_at')
+
+    def to_representation(self, game: Game) -> dict:
+        response = super().to_representation(game)
+        if game.thumbnail:
+            response['thumbnail'] = game.thumbnail.url
+
+        return response
+
+    class Meta:
+        model = Game
+        fields = _get_game_serializer_fields
+
+
+class RetrieveGameSerializer(ListGameSerializer):
+    game_path = serializers.SerializerMethodField()
+
+    def get_game_path(self, game: Game) -> str:
+        return reverse_lazy('games:source', kwargs={
+            'slug': game.slug,
+            'version': game.version,
+        })
 
     class Meta:
         model = Game
         fields = (
-            'author',
-            'slug',
-            'title',
-            'description',
-            'version',
-            'thumbnail',
-            'upload_timestamp',
+            *_get_game_serializer_fields,
+            'game_path',
         )

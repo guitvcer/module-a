@@ -28,3 +28,4 @@ services:
     image: postgres:15-bullseye
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
+    command: ["postgres", "-c", "log_statement=all"]

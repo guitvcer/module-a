@@ -1,7 +1,14 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from . import views
+from .views import GameViewSet, SourceGameView
+
+app_name = 'games'
+
+router = DefaultRouter()
+router.register('', GameViewSet, basename='game')
 
 urlpatterns = [
-    path('', views.CreateGameAPIView.as_view()),
+    *router.urls,
+    path('<slug:slug>/<int:version>/', SourceGameView.as_view(), name='source'),
 ]

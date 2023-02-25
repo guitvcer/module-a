@@ -1,6 +1,7 @@
-from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from . import serializers
 from .filters import GamesOrderingFilter
@@ -8,24 +9,35 @@ from .models import Game
 from .paginations import GamePagination
 from .permissions import CRUDPermission
 
-GameSerializer = type[serializers.CreateGameSerializer | serializers.GetGameSerializer]
+GameSerializer = type[
+    serializers.CreateGameSerializer |
+    serializers.ListGameSerializer |
+    serializers.RetrieveGameSerializer
+]
 
 
-class CreateGameAPIView(generics.ListCreateAPIView):
+class GameViewSet(ModelViewSet):
     pagination_class = GamePagination
     permission_classes = (CRUDPermission, )
     filter_backends = (GamesOrderingFilter, )
     ordering = ('title', )
     ordering_fields = ('title', 'description', 'uploaddate')
     queryset = Game.objects.filter(version__gte=1)
+    lookup_field = 'slug'
 
     def create(self, request: Request) -> Response:
         request.data['author'] = request.user.id
         return super().create(request)
 
     def get_serializer_class(self) -> GameSerializer:
-        match self.request.method:
-            case 'GET':
-                return serializers.GetGameSerializer
-            case 'POST':
-                return serializers.CreateGameSerializer
+        action_serializer_class_map = {
+            'list': serializers.ListGameSerializer,
+            'retrieve': serializers.RetrieveGameSerializer,
+            'create': serializers.CreateGameSerializer,
+        }
+
+        return action_serializer_class_map[self.action]
+
+
+class SourceGameView(APIView):
+    pass
