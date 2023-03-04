@@ -7,7 +7,7 @@ from authorization.models import User
 class Game(models.Model):
 
     def _directory_path(self, filename: str) -> str:
-        return f'users/{self.author.username}/{filename}'
+        return f'games/{self.slug}/{self.version}/{filename}'
 
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Author')
 
