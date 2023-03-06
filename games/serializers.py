@@ -94,14 +94,15 @@ class UploadGameSerializer(serializers.Serializer):
     token = serializers.CharField()
     zipfile = serializers.FileField()
 
-    def validate(self, attrs: dict):
+    def validate(self, attrs: dict) -> dict:
         self._validate_zipfile(attrs['zipfile'])
         self._validate_token(attrs['token'])
         self._validate_slug(self.context['slug'])
+        self._validate_author()
 
         return attrs
 
-    def _validate_zipfile(self, zipfile: InMemoryUploadedFile) -> InMemoryUploadedFile:
+    def _validate_zipfile(self, zipfile: InMemoryUploadedFile) -> None:
         try:
             extracted = ZipFile(zipfile)
         except BadZipFile:
@@ -115,9 +116,7 @@ class UploadGameSerializer(serializers.Serializer):
         thumbnail = io.BytesIO(thumbnail)
         self._thumbnail = File(thumbnail, name='thumbnail.png')
 
-        return zipfile
-
-    def _validate_token(self, token: str) -> str:
+    def _validate_token(self, token: str) -> None:
         auth = Authentication()
         try:
             validated_token = auth.get_validated_token(token)
@@ -131,22 +130,19 @@ class UploadGameSerializer(serializers.Serializer):
         except (AuthenticationFailed, UserBlocked):
             raise ValidationError('User not found')
 
-        return token
-
-    def _validate_slug(self, slug: str) -> str:
+    def _validate_slug(self, slug: str) -> None:
         if last_version_game := self._get_last_version_game(slug):
             self._last_version_game = last_version_game
-            return slug
+            return
 
         raise ValidationError('Invalid slug')
 
     def _get_last_version_game(self, slug: str) -> Game | None:
-        return Game.objects.filter(
-            author=self._user,  # todo fix
-            slug=slug,
-        ).order_by(
-            '-version',
-        ).last()
+        return Game.objects.filter(slug=slug).order_by('-version').last()
+
+    def _validate_author(self) -> None:
+        if self._user != self._last_version_game.author:
+            raise ValidationError('User is not author of the game')
 
     def save(self) -> Game:
         version = self._last_version_game.version + 1
