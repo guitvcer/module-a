@@ -138,11 +138,7 @@ class UploadGameSerializer(serializers.Serializer):
         raise ValidationError('Invalid slug')
 
     def _get_last_version_game(self, slug: str) -> Game | None:
-        return Game.objects.filter(
-            slug=slug,
-        ).order_by(
-            '-version',
-        ).last()
+        return Game.objects.filter(slug=slug).order_by('-version').last()
 
     def _validate_author(self) -> None:
         if self._user != self._last_version_game.author:
