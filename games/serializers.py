@@ -1,7 +1,16 @@
+import io
+from zipfile import ZipFile, BadZipFile
+
+from django.core.files import File
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import IntegrityError
 from django.urls import reverse_lazy
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
 
+from authorization.authentication import Authentication
+from authorization.exceptions import InvalidToken, UserBlocked
 from .exceptions import GameAlreadyExists
 from .models import Game
 
@@ -79,3 +88,83 @@ class RetrieveGameSerializer(ListGameSerializer):
             *_get_game_serializer_fields,
             'game_path',
         )
+
+
+class UploadGameSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    zipfile = serializers.FileField()
+
+    def validate(self, attrs: dict):
+        self._validate_zipfile(attrs['zipfile'])
+        self._validate_token(attrs['token'])
+        self._validate_slug(self.context['slug'])
+
+        return attrs
+
+    def _validate_zipfile(self, zipfile: InMemoryUploadedFile) -> InMemoryUploadedFile:
+        try:
+            extracted = ZipFile(zipfile)
+        except BadZipFile:
+            raise ValidationError('ZIP file extraction fails')
+
+        file_names = extracted.namelist()
+        if 'index.html' not in file_names:
+            raise ValidationError('The ZIP file must at least contain an index.html file.')
+
+        thumbnail = extracted.read('thumbnail.png')
+        thumbnail = io.BytesIO(thumbnail)
+        self._thumbnail = File(thumbnail, name='thumbnail.png')
+
+        return zipfile
+
+    def _validate_token(self, token: str) -> str:
+        auth = Authentication()
+        try:
+            validated_token = auth.get_validated_token(token)
+        except InvalidToken:
+            raise ValidationError('Token is invalid')
+
+        try:
+            self._user = auth.get_user(validated_token)
+        except InvalidToken:
+            raise ValidationError('Token is invalid')
+        except (AuthenticationFailed, UserBlocked):
+            raise ValidationError('User not found')
+
+        return token
+
+    def _validate_slug(self, slug: str) -> str:
+        if last_version_game := self._get_last_version_game(slug):
+            self._last_version_game = last_version_game
+            return slug
+
+        raise ValidationError('Invalid slug')
+
+    def _get_last_version_game(self, slug: str) -> Game | None:
+        return Game.objects.filter(
+            # author=self._user,  # todo fix
+            author_id=1,
+            slug=slug,
+        ).order_by(
+            '-version',
+        ).last()
+
+    def save(self) -> Game:
+        version = self._last_version_game.version + 1
+        title = self._last_version_game.title
+        description = self._last_version_game.description
+        source = self.validated_data['zipfile']
+
+        game = Game.objects.create(
+            author=self._user,
+            version=version,
+            title=title,
+            description=description,
+            source=source,
+            thumbnail=self._thumbnail,
+        )
+
+        return game
+
+    class Meta:
+        fields = ('zipfile', 'token', 'slug')
