@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -38,6 +39,14 @@ class GameViewSet(ModelViewSet):
         }
 
         return action_serializer_class_map[self.action]
+
+    def get_object(self) -> Game:
+        lookup_field, slug = self.lookup_field, self.kwargs['slug']
+        game = Game.objects.filter(**{lookup_field: slug}).order_by('-version').last()
+        if not game:
+            raise NotFound('Game not found')
+
+        return game
 
 
 class UploadGameView(APIView):

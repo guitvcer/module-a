@@ -76,11 +76,11 @@ class RetrieveGameSerializer(ListGameSerializer):
     game_path = serializers.SerializerMethodField()
 
     def get_game_path(self, game: Game) -> str:
-        # return ''  # todo fix
-        return reverse_lazy('games:source', kwargs={
-            'slug': game.slug,
-            'version': game.version,
-        })
+        return ''  # todo fix
+        # return reverse_lazy('games:source', kwargs={
+        #     'slug': game.slug,
+        #     'version': game.version,
+        # })
 
     class Meta:
         model = Game
