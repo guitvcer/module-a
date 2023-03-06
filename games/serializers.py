@@ -98,6 +98,7 @@ class UploadGameSerializer(serializers.Serializer):
         self._validate_zipfile(attrs['zipfile'])
         self._validate_token(attrs['token'])
         self._validate_slug(self.context['slug'])
+        self._validate_author()
 
         return attrs
 
@@ -142,11 +143,14 @@ class UploadGameSerializer(serializers.Serializer):
 
     def _get_last_version_game(self, slug: str) -> Game | None:
         return Game.objects.filter(
-            author=self._user,  # todo fix
             slug=slug,
         ).order_by(
             '-version',
         ).last()
+
+    def _validate_author(self) -> None:
+        if self._user != self._last_version_game.author:
+            raise ValidationError('User is not author of the game')
 
     def save(self) -> Game:
         version = self._last_version_game.version + 1
