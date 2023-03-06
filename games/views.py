@@ -31,6 +31,14 @@ class GameViewSet(ModelViewSet):
         request.data['author'] = request.user.id
         return super().create(request)
 
+    def destroy(self, request: Request, slug: str) -> Response:
+        Game.objects.filter(
+            **{self.lookup_field: slug},
+            is_active=True,
+        ).update(is_active=False)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def get_serializer_class(self) -> GameSerializer:
         action_serializer_class_map = {
             'list': serializers.ListGameSerializer,
