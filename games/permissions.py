@@ -3,6 +3,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from authorization.models import User
+from .exceptions import NotGameAuthor
 
 
 class CRUDPermission(BasePermission):
@@ -12,3 +13,12 @@ class CRUDPermission(BasePermission):
                 return True
             case 'POST':
                 return isinstance(request.user, User)
+            case 'DELETE':
+                if not isinstance(request.user, User):
+                    return False
+
+                game = view.get_object()
+                if game.author == request.user:
+                    return True
+
+                raise NotGameAuthor()
