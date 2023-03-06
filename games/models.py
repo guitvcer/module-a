@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
@@ -8,11 +7,11 @@ from authorization.models import User
 class Game(models.Model):
 
     def _directory_path(self, filename: str) -> str:
-        return f'users/{self.author.username}/{filename}'
+        return f'games/{self.slug}/{self.version}/{filename}'
 
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Author')
 
-    slug = models.SlugField(unique=True, verbose_name='Slug')
+    slug = models.SlugField(verbose_name='Slug')
     title = models.CharField(max_length=60, verbose_name='Title')
     description = models.CharField(max_length=200, verbose_name='Description')
 

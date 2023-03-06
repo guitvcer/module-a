@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,7 +24,7 @@ class GameViewSet(ModelViewSet):
     ordering = ('title', )
     ordering_fields = ('title', 'description', 'uploaddate')
     queryset = Game.objects.filter(version__gte=1)
-    lookup_field = 'slug'
+    lookup_field = 'slug'  # todo fix get last version
 
     def create(self, request: Request) -> Response:
         request.data['author'] = request.user.id
@@ -39,5 +40,15 @@ class GameViewSet(ModelViewSet):
         return action_serializer_class_map[self.action]
 
 
-class SourceGameView(APIView):
-    pass
+class UploadGameView(APIView):
+    serializer_class = serializers.UploadGameSerializer
+
+    def post(self, request: Request, slug: str) -> Response:
+        serializer = self.serializer_class(
+            data=request.data,
+            context={'slug': slug},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=status.HTTP_201_CREATED)
