@@ -39,11 +39,16 @@ class GameViewSet(ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def update(self, request: Request, slug: str) -> Response:
+        response = {'status': 'success'}
+        return Response(response, status=status.HTTP_200_OK)
+
     def get_serializer_class(self) -> GameSerializer:
         action_serializer_class_map = {
             'list': serializers.ListGameSerializer,
             'retrieve': serializers.RetrieveGameSerializer,
             'create': serializers.CreateGameSerializer,
+            'update': serializers.UpdateGameSerializer,
         }
 
         return action_serializer_class_map[self.action]
