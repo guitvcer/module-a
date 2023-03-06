@@ -22,6 +22,7 @@ class Game(models.Model):
         upload_to=_directory_path, verbose_name='Thumbnail', null=True)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
+    is_active = models.BooleanField(default=True, verbose_name='Is Active?')
 
     def save(self, *args, **kwargs) -> "Game":
         if not self.slug:
