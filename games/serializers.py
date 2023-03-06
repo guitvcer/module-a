@@ -142,8 +142,7 @@ class UploadGameSerializer(serializers.Serializer):
 
     def _get_last_version_game(self, slug: str) -> Game | None:
         return Game.objects.filter(
-            # author=self._user,  # todo fix
-            author_id=1,
+            author=self._user,  # todo fix
             slug=slug,
         ).order_by(
             '-version',
