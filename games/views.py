@@ -1,4 +1,3 @@
-from django.db.models import F
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
