@@ -90,6 +90,12 @@ class RetrieveGameSerializer(ListGameSerializer):
         )
 
 
+class UpdateGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Game
+        fields = ('title', 'description')
+
+
 class UploadGameSerializer(serializers.Serializer):
     token = serializers.CharField()
     zipfile = serializers.FileField()

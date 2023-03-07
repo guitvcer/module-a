@@ -14,11 +14,16 @@ class CRUDPermission(BasePermission):
             case 'POST':
                 return isinstance(request.user, User)
             case 'DELETE':
-                if not isinstance(request.user, User):
-                    return False
+                return self._is_game_author(request, view)
+            case 'PUT':
+                return self._is_game_author(request, view)
 
-                game = view.get_object()
-                if game.author == request.user:
-                    return True
+    def _is_game_author(self, request: Request, view: APIView) -> bool:
+        if not isinstance(request.user, User):
+            return False
 
-                raise NotGameAuthor()
+        game = view.get_object()
+        if game.author == request.user:
+            return True
+
+        raise NotGameAuthor()
