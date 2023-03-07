@@ -29,3 +29,10 @@ class Game(models.Model):
             self.slug = slugify(self.title)
 
         return super().save(*args, **kwargs)
+
+
+class Score(models.Model):
+    score = models.PositiveSmallIntegerField(verbose_name='Score')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, verbose_name='Game')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='User')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
