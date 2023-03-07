@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,7 +9,7 @@ from . import serializers
 
 
 class SignUpView(APIView):
-    serializer_class = serializers.UserSerializer
+    serializer_class = serializers.SignUpSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -25,7 +26,7 @@ class SignUpView(APIView):
 
 
 class SignInView(APIView):
-    serializer_class = serializers.UserSerializer
+    serializer_class = serializers.SignInSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
