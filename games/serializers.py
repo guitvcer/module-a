@@ -12,7 +12,7 @@ from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from authorization.authentication import Authentication
 from authorization.exceptions import InvalidToken, UserBlocked
 from .exceptions import GameAlreadyExists
-from .models import Game
+from .models import Game, Score
 
 
 class CreateGameSerializer(serializers.ModelSerializer):
@@ -169,3 +169,12 @@ class UploadGameSerializer(serializers.Serializer):
 
     class Meta:
         fields = ('zipfile', 'token', 'slug')
+
+
+class CreateScoreSerializer(serializers.ModelSerializer):
+    def create(self, validated_data: dict) -> "Meta.model":
+        return self.Meta.model.objects.create(**validated_data, **self.context)
+
+    class Meta:
+        model = Score
+        fields = ('score', )
