@@ -1,6 +1,7 @@
+from django.db.models import QuerySet
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,7 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 from authorization.permissions import IsAuthenticated
 from . import serializers
 from .filters import GamesOrderingFilter
-from .models import Game
+from .models import Game, Score
 from .paginations import GamePagination
 from .permissions import CRUDPermission
 
@@ -17,6 +18,11 @@ GameSerializer = type[
     serializers.CreateGameSerializer |
     serializers.ListGameSerializer |
     serializers.RetrieveGameSerializer
+]
+
+ScoreSerializer = type[
+    serializers.GetScoreSerializer |
+    serializers.CreateScoreSerializer
 ]
 
 
@@ -78,16 +84,33 @@ class UploadGameView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class CreateScoreView(CreateAPIView):
-    serializer_class = serializers.CreateScoreSerializer
+class CreateScoreView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, )
 
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'scores': serializer.data})
+
+    def get_queryset(self) -> QuerySet:
+        return Score.objects.filter(game=self._get_game())
+
     def get_serializer_context(self) -> dict:
+        return {
+            'user': self.request.user,
+            'game': self._get_game(),
+        }
+
+    def _get_game(self) -> Game:
         game = Game.objects.filter(slug=self.kwargs['slug']).order_by('-version').last()
         if not game:
             raise NotFound('Game not found')
 
-        return {
-            'user': self.request.user,
-            'game': game,
-        }
+        return game
+
+    def get_serializer_class(self) -> ScoreSerializer:
+        match self.request.method:
+            case 'GET':
+                return serializers.GetScoreSerializer
+            case 'POST':
+                return serializers.CreateScoreSerializer

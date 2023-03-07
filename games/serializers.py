@@ -171,6 +171,18 @@ class UploadGameSerializer(serializers.Serializer):
         fields = ('zipfile', 'token', 'slug')
 
 
+class GetScoreSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    timestamp = serializers.DateTimeField(source='created_at')
+
+    def get_username(self, score: Score) -> str:
+        return score.user.username
+
+    class Meta:
+        model = Score
+        fields = ('username', 'score', 'timestamp')
+
+
 class CreateScoreSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> "Meta.model":
         return self.Meta.model.objects.create(**validated_data, **self.context)
