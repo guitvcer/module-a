@@ -1,10 +1,12 @@
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.generics import CreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from authorization.permissions import IsAuthenticated
 from . import serializers
 from .filters import GamesOrderingFilter
 from .models import Game
@@ -74,3 +76,18 @@ class UploadGameView(APIView):
         serializer.save()
 
         return Response(status=status.HTTP_201_CREATED)
+
+
+class CreateScoreView(CreateAPIView):
+    serializer_class = serializers.CreateScoreSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_serializer_context(self) -> dict:
+        game = Game.objects.filter(slug=self.kwargs['slug']).order_by('-version').last()
+        if not game:
+            raise NotFound('Game not found')
+
+        return {
+            'user': self.request.user,
+            'game': game,
+        }
