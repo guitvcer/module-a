@@ -9,7 +9,8 @@ class Game(models.Model):
     def _directory_path(self, filename: str) -> str:
         return f'games/{self.slug}/{self.version}/{filename}'
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Author')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name='Author', related_name='games')
 
     slug = models.SlugField(verbose_name='Slug')
     title = models.CharField(max_length=60, verbose_name='Title')
@@ -34,5 +35,6 @@ class Game(models.Model):
 class Score(models.Model):
     score = models.PositiveSmallIntegerField(verbose_name='Score')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, verbose_name='Game')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='User')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name='User', related_name='scores')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
