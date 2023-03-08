@@ -4,6 +4,7 @@ from zipfile import ZipFile, BadZipFile
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import IntegrityError
+from django.urls import reverse_lazy
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
@@ -75,11 +76,10 @@ class RetrieveGameSerializer(ListGameSerializer):
     game_path = serializers.SerializerMethodField()
 
     def get_game_path(self, game: Game) -> str:
-        return ''  # todo fix
-        # return reverse_lazy('games:source', kwargs={
-        #     'slug': game.slug,
-        #     'version': game.version,
-        # })
+        return reverse_lazy('games:serve', kwargs={
+            'slug': game.slug,
+            'version': game.version,
+        })
 
     class Meta:
         model = Game
