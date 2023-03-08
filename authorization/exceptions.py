@@ -1,6 +1,6 @@
 from rest_framework.exceptions import APIException
 
-from .models import User
+from users.models import User
 
 
 class UserAlreadyExists(APIException):

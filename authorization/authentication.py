@@ -1,8 +1,8 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import AccessToken
 
+from users.models import User
 from .exceptions import UserBlocked
-from .models import User
 
 
 class Authentication(JWTAuthentication):

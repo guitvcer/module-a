@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 
-from authorization.models import User
+from users.models import User
 
 
 class Game(models.Model):

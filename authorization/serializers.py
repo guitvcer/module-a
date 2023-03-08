@@ -2,8 +2,8 @@ import django.db.utils
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import serializers
 
+from users.models import User
 from . import exceptions
-from .models import User
 
 
 class BaseSignSerializer(serializers.ModelSerializer):

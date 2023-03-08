@@ -1,7 +1,7 @@
 from rest_framework.generics import RetrieveAPIView
 
-from authorization.models import User
 from authorization.permissions import IsAuthenticated
+from .models import User
 from .serializers import UserSerializer
 
 
