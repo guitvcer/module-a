@@ -14,7 +14,6 @@ class UserGameSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     registered_timestamp = serializers.DateTimeField(source='created_at')
-    # authored_games = UserGameSerializer(many=True, source='games')
     highscores = GetScoreSerializer(many=True, source='scores')
 
     authored_games = serializers.SerializerMethodField()
