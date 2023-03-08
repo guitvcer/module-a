@@ -2,12 +2,12 @@ from io import BytesIO
 from zipfile import ZipFile
 
 from django.db.models import QuerySet
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
