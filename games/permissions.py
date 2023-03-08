@@ -2,7 +2,7 @@ from rest_framework.permissions import BasePermission
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from authorization.models import User
+from users.models import User
 from .exceptions import NotGameAuthor
 
 

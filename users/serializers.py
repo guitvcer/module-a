@@ -1,9 +1,9 @@
 from django.db.models import QuerySet
 from rest_framework import serializers
 
-from authorization.models import User
 from games.models import Game
 from games.serializers import GetScoreSerializer
+from users.models import User
 
 
 class UserGameSerializer(serializers.ModelSerializer):
