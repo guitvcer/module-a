@@ -98,7 +98,7 @@ class ServeGameView(View):
         return HttpResponse(index_html)
 
 
-class CreateScoreView(ListCreateAPIView):
+class ScoreView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, )
 
     def list(self, request: Request, *args, **kwargs) -> Response:
