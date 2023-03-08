@@ -1,4 +1,10 @@
+from io import BytesIO
+from zipfile import ZipFile
+
 from django.db.models import QuerySet
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.views import View
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListCreateAPIView
@@ -82,6 +88,14 @@ class UploadGameView(APIView):
         serializer.save()
 
         return Response(status=status.HTTP_201_CREATED)
+
+
+class ServeGameView(View):
+    def get(self, request: Request, slug: str, version: int) -> HttpResponse:
+        game = get_object_or_404(Game, slug=slug, version=version)
+        extracted = ZipFile(BytesIO(game.source.read()))
+        index_html = extracted.read('index.html').decode()
+        return HttpResponse(index_html)
 
 
 class CreateScoreView(ListCreateAPIView):
