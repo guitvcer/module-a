@@ -76,7 +76,7 @@ class RetrieveGameSerializer(ListGameSerializer):
     game_path = serializers.SerializerMethodField()
 
     def get_game_path(self, game: Game) -> str:
-        return reverse_lazy('games:serve', kwargs={
+        return reverse_lazy('serve', kwargs={
             'slug': game.slug,
             'version': game.version,
         })
