@@ -39,7 +39,7 @@ class GameViewSet(ModelViewSet):
     ordering = ('title', )
     ordering_fields = ('title', 'description', 'uploaddate')
     queryset = Game.objects.filter(version__gte=1)
-    lookup_field = 'slug'  # todo fix get last version
+    lookup_field = 'slug'
 
     def create(self, request: Request) -> Response:
         request.data['author'] = request.user.id
