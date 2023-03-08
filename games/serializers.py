@@ -12,21 +12,16 @@ from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from authorization.authentication import Authentication
 from authorization.exceptions import InvalidToken, UserBlocked
 from .exceptions import GameAlreadyExists
-from .models import Game, Score
+from .models import Game, GameVersion, Score
 
 
 class CreateGameSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(min_length=3, max_length=60)
-    slug = serializers.CharField(required=False)
-
     class Meta:
         model = Game
         fields = (
             'author',
-            'slug',
             'title',
             'description',
-            'version',
         )
 
     @property
@@ -51,7 +46,6 @@ _get_game_serializer_fields = (
     'slug',
     'title',
     'description',
-    'version',
     'thumbnail',
     'upload_timestamp',
 )
@@ -78,7 +72,7 @@ class RetrieveGameSerializer(ListGameSerializer):
     def get_game_path(self, game: Game) -> str:
         return reverse_lazy('serve', kwargs={
             'slug': game.slug,
-            'version': game.version,
+            'version': game.last_version.version,
         })
 
     class Meta:
@@ -136,35 +130,32 @@ class UploadGameSerializer(serializers.Serializer):
             raise ValidationError('User not found')
 
     def _validate_slug(self, slug: str) -> None:
-        if last_version_game := self._get_last_version_game(slug):
-            self._last_version_game = last_version_game
-            return
-
-        raise ValidationError('Invalid slug')
-
-    def _get_last_version_game(self, slug: str) -> Game | None:
-        return Game.objects.filter(slug=slug).order_by('-version').last()
+        self._game = Game.objects.get(slug=slug)
 
     def _validate_author(self) -> None:
-        if self._user != self._last_version_game.author:
+        if self._user != self._game.author:
             raise ValidationError('User is not author of the game')
 
     def save(self) -> Game:
-        version = self._last_version_game.version + 1
-        title = self._last_version_game.title
-        description = self._last_version_game.description
-        source = self.validated_data['zipfile']
+        if self._thumbnail:
+            self._game.thumbnail = self._thumbnail
+            self._game.save()
 
-        game = Game.objects.create(
-            author=self._user,
-            version=version,
-            title=title,
-            description=description,
-            source=source,
-            thumbnail=self._thumbnail,
-        )
+        source = self.validated_data['zipfile']
+        kwargs = {
+            'game': self._game,
+            'source': source,
+        }
+        if last_version := self._game.last_version:
+            kwargs['version'] = last_version.version + 1
+
+        game = GameVersion.objects.create(**kwargs)
 
         return game
+
+    @property
+    def data(self) -> None:
+        return
 
     class Meta:
         fields = ('zipfile', 'token', 'slug')
