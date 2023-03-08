@@ -27,6 +27,7 @@ INSTALLED_APPS = [
 
     'authorization',
     'games',
+    'users',
 ]
 
 MIDDLEWARE = [

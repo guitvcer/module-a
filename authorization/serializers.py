@@ -6,7 +6,7 @@ from . import exceptions
 from .models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class BaseSignSerializer(serializers.ModelSerializer):
     username = serializers.CharField(min_length=4, max_length=60, required=True)
     password = serializers.CharField(min_length=8, max_length=2**16, required=True)
 
@@ -14,6 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'password')
 
+
+class SignUpSerializer(BaseSignSerializer):
     def save(self) -> User:
         username, password = self.validated_data['username'], self.validated_data['password']
         encoded_password = make_password(password)
@@ -24,6 +26,8 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
+
+class SignInSerializer(BaseSignSerializer):
     def get(self) -> User:
         username, password = self.validated_data['username'], self.validated_data['password']
         try:
