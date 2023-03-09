@@ -10,6 +10,11 @@ def deactivate_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: Quer
     queryset.update(is_active=False)
 
 
+@admin.action(description='Activate selected users')
+def activate_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: QuerySet) -> None:
+    queryset.update(is_active=True)
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    actions = (deactivate_users, )
+    actions = (deactivate_users, activate_users)
