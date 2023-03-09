@@ -19,3 +19,11 @@ def activate_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: QueryS
 class UserAdmin(admin.ModelAdmin):
     actions = (deactivate_users, activate_users)
     exclude = ('password', )
+    list_display = (
+        'username',
+        'is_active',
+        'is_blocked',
+        'block_reason',
+        'created_at',
+        'last_login',
+    )
