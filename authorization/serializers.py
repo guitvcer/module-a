@@ -1,6 +1,9 @@
+from datetime import datetime
+
 import django.db.utils
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
 from . import exceptions
@@ -9,6 +12,17 @@ from . import exceptions
 class BaseSignSerializer(serializers.ModelSerializer):
     username = serializers.CharField(min_length=4, max_length=60, required=True)
     password = serializers.CharField(min_length=8, max_length=2**16, required=True)
+
+    @property
+    def data(self) -> dict:
+        self._user.last_login = datetime.utcnow()
+        self._user.save()
+
+        refresh_token = RefreshToken.for_user(self._user)
+        return {
+            'status': 'success',
+            'token': str(refresh_token),
+        }
 
     class Meta:
         model = User
@@ -20,25 +34,25 @@ class SignUpSerializer(BaseSignSerializer):
         username, password = self.validated_data['username'], self.validated_data['password']
         encoded_password = make_password(password)
         try:
-            user = User.objects.create(username=username, password=encoded_password)
+            self._user = User.objects.create(username=username, password=encoded_password)
         except django.db.utils.IntegrityError:
             raise exceptions.UserAlreadyExists()
 
-        return user
+        return self._user
 
 
 class SignInSerializer(BaseSignSerializer):
-    def get(self) -> User:
-        username, password = self.validated_data['username'], self.validated_data['password']
+    def validate(self, data: dict) -> User:
+        username, password = data['username'], data['password']
         try:
-            user = User.objects.get(username=username)
+            self._user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise exceptions.InvalidCredentials()
 
-        if user.is_blocked:
-            raise exceptions.UserBlocked(user.block_reason)
+        if self._user.is_blocked:
+            raise exceptions.UserBlocked(self._user.block_reason)
 
-        if check_password(password, user.password):
-            return user
+        if check_password(password, self._user.password):
+            return self._user
 
         raise exceptions.InvalidCredentials()
