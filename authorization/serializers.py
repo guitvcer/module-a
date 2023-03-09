@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import django.db.utils
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import serializers
@@ -13,6 +15,9 @@ class BaseSignSerializer(serializers.ModelSerializer):
 
     @property
     def data(self) -> dict:
+        self._user.last_login = datetime.utcnow()
+        self._user.save()
+
         refresh_token = RefreshToken.for_user(self._user)
         return {
             'status': 'success',
