@@ -48,10 +48,6 @@ class GameViewSet(ModelViewSet):
         game.is_active = False
         game.save()
 
-    def update(self, request: Request, slug: str) -> Response:
-        response = {'status': 'success'}
-        return Response(response, status=status.HTTP_200_OK)
-
     def get_serializer_class(self) -> GameSerializer:
         action_serializer_class_map = {
             'list': serializers.ListGameSerializer,

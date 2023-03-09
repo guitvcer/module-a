@@ -94,6 +94,10 @@ class RetrieveGameSerializer(ListGameSerializer):
 
 
 class UpdateGameSerializer(serializers.ModelSerializer):
+    @property
+    def data(self):
+        return {'status': 'success'}
+
     class Meta:
         model = Game
         fields = ('title', 'description')
