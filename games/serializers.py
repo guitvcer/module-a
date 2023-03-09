@@ -56,6 +56,7 @@ _get_game_serializer_fields = (
 class ListGameSerializer(serializers.ModelSerializer):
     upload_timestamp = serializers.DateTimeField(source='created_at')
     score_count = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
 
     def to_representation(self, game: Game) -> dict:
         response = super().to_representation(game)
@@ -66,6 +67,9 @@ class ListGameSerializer(serializers.ModelSerializer):
 
     def get_score_count(self, game: Game) -> int:
         return game.scores.aggregate(Sum('score'))['score__sum']
+
+    def get_author(self, game: Game) -> str:
+        return game.author.username
 
     class Meta:
         model = Game
