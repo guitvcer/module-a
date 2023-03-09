@@ -39,3 +39,11 @@ class SignInView(APIView):
         }
 
         return Response(response, status=status.HTTP_200_OK)
+
+
+class SignOutView(APIView):
+    def post(self, request: Request) -> Response:
+        response = Response({'status': 'success'}, status=status.HTTP_200_OK)
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        return response
