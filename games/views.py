@@ -4,9 +4,7 @@ from zipfile import ZipFile
 from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.views import View
 from django.views.generic import DetailView
-from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
