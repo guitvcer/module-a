@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 
@@ -17,8 +19,8 @@ class User(models.Model):
         max_length=128, choices=BlockReasonChoices.choices,
         null=True, blank=True, verbose_name='Block Reason')
 
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
-    last_login = models.DateTimeField(auto_now=True, verbose_name='Last Login')
+    created_at = models.DateTimeField(default=datetime.utcnow(), verbose_name='Created At')
+    last_login = models.DateTimeField(default=datetime.utcnow(), verbose_name='Last Login')
 
     def __str__(self) -> str:
         return self.username
