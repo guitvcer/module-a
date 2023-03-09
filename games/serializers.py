@@ -49,11 +49,13 @@ _get_game_serializer_fields = (
     'description',
     'thumbnail',
     'upload_timestamp',
+    'score_count',
 )
 
 
 class ListGameSerializer(serializers.ModelSerializer):
     upload_timestamp = serializers.DateTimeField(source='created_at')
+    score_count = serializers.SerializerMethodField()
 
     def to_representation(self, game: Game) -> dict:
         response = super().to_representation(game)
@@ -62,6 +64,9 @@ class ListGameSerializer(serializers.ModelSerializer):
 
         return response
 
+    def get_score_count(self, game: Game) -> int:
+        return game.scores.aggregate(Sum('score'))['score__sum']
+
     class Meta:
         model = Game
         fields = _get_game_serializer_fields
@@ -69,7 +74,6 @@ class ListGameSerializer(serializers.ModelSerializer):
 
 class RetrieveGameSerializer(ListGameSerializer):
     game_path = serializers.SerializerMethodField()
-    score_count = serializers.SerializerMethodField()
 
     def get_game_path(self, game: Game) -> str:
         return reverse_lazy('serve', kwargs={
@@ -77,15 +81,11 @@ class RetrieveGameSerializer(ListGameSerializer):
             'version': game.last_version.version,
         })
 
-    def get_score_count(self, game: Game) -> int:
-        return game.scores.aggregate(Sum('score'))['score__sum']
-
     class Meta:
         model = Game
         fields = (
             *_get_game_serializer_fields,
             'game_path',
-            'score_count'
         )
 
 
