@@ -14,6 +14,7 @@ class User(models.Model):
 
     is_blocked = models.BooleanField(default=False, verbose_name='Is Blocked?')
     block_reason = models.CharField(
-        max_length=128, choices=BlockReasonChoices.choices, null=True, verbose_name='Block Reason')
+        max_length=128, choices=BlockReasonChoices.choices,
+        null=True, blank=True, verbose_name='Block Reason')
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
