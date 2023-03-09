@@ -43,7 +43,8 @@ class GameVersion(models.Model):
 
 class Score(models.Model):
     score = models.PositiveSmallIntegerField(verbose_name='Score')
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, verbose_name='Game')
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, verbose_name='Game', related_name='scores')
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='User', related_name='scores')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
