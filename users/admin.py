@@ -15,9 +15,14 @@ def activate_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: QueryS
     queryset.update(is_active=True)
 
 
+@admin.action(description='Block selected users')
+def block_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: QuerySet) -> None:
+    queryset.update(is_blocked=True, block_reason=User.BlockReasonChoices.BY_ADMIN)
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    actions = (deactivate_users, activate_users)
+    actions = (deactivate_users, activate_users, block_users)
     exclude = ('password', )
     list_display = (
         'username',
