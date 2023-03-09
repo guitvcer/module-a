@@ -5,6 +5,7 @@ from django.db.models import QuerySet
 
 from .models import User
 
+
 @admin.action(description='Deactivate selected users')
 def deactivate_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: QuerySet) -> None:
     queryset.update(is_active=False)
