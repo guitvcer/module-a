@@ -4,6 +4,7 @@ from zipfile import ZipFile, BadZipFile
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import IntegrityError
+from django.db.models import Sum
 from django.urls import reverse_lazy
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -48,11 +49,13 @@ _get_game_serializer_fields = (
     'description',
     'thumbnail',
     'upload_timestamp',
+    'score_count',
 )
 
 
 class ListGameSerializer(serializers.ModelSerializer):
     upload_timestamp = serializers.DateTimeField(source='created_at')
+    score_count = serializers.SerializerMethodField()
 
     def to_representation(self, game: Game) -> dict:
         response = super().to_representation(game)
@@ -60,6 +63,9 @@ class ListGameSerializer(serializers.ModelSerializer):
             response['thumbnail'] = game.thumbnail.url
 
         return response
+
+    def get_score_count(self, game: Game) -> int:
+        return game.scores.aggregate(Sum('score'))['score__sum']
 
     class Meta:
         model = Game
