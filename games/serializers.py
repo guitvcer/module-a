@@ -4,6 +4,7 @@ from zipfile import ZipFile, BadZipFile
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import IntegrityError
+from django.db.models import Sum
 from django.urls import reverse_lazy
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -68,6 +69,7 @@ class ListGameSerializer(serializers.ModelSerializer):
 
 class RetrieveGameSerializer(ListGameSerializer):
     game_path = serializers.SerializerMethodField()
+    score_count = serializers.SerializerMethodField()
 
     def get_game_path(self, game: Game) -> str:
         return reverse_lazy('serve', kwargs={
@@ -75,11 +77,15 @@ class RetrieveGameSerializer(ListGameSerializer):
             'version': game.last_version.version,
         })
 
+    def get_score_count(self, game: Game) -> int:
+        return game.scores.aggregate(Sum('score'))['score__sum']
+
     class Meta:
         model = Game
         fields = (
             *_get_game_serializer_fields,
             'game_path',
+            'score_count'
         )
 
 
