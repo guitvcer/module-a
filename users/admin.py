@@ -37,3 +37,4 @@ class UserAdmin(admin.ModelAdmin):
         'created_at',
         'last_login',
     )
+    search_fields = ('username', )
