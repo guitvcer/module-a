@@ -5,18 +5,17 @@ from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
+from django.views.generic import DetailView
 from rest_framework import status
-from rest_framework.exceptions import NotFound
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from authorization.permissions import IsAuthenticated
 from . import serializers
 from .filters import GamesOrderingFilter
-from .models import Game, Score
+from .models import Game, Score, GameVersion
 from .paginations import GamePagination
 from .permissions import CRUDPermission
 
@@ -38,20 +37,16 @@ class GameViewSet(ModelViewSet):
     filter_backends = (GamesOrderingFilter, )
     ordering = ('title', )
     ordering_fields = ('title', 'description', 'uploaddate')
-    queryset = Game.objects.filter(version__gte=1)
-    lookup_field = 'slug'  # todo fix get last version
+    queryset = Game.objects.filter(is_active=True)
+    lookup_field = 'slug'
 
     def create(self, request: Request) -> Response:
         request.data['author'] = request.user.id
         return super().create(request)
 
-    def destroy(self, request: Request, slug: str) -> Response:
-        Game.objects.filter(
-            **{self.lookup_field: slug},
-            is_active=True,
-        ).update(is_active=False)
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def perform_destroy(self, game: Game) -> None:
+        game.is_active = False
+        game.save()
 
     def update(self, request: Request, slug: str) -> Response:
         response = {'status': 'success'}
@@ -67,39 +62,38 @@ class GameViewSet(ModelViewSet):
 
         return action_serializer_class_map[self.action]
 
-    def get_object(self) -> Game:
-        lookup_field, slug = self.lookup_field, self.kwargs['slug']
-        game = Game.objects.filter(**{lookup_field: slug}).order_by('-version').last()
-        if not game:
-            raise NotFound('Game not found')
 
-        return game
-
-
-class UploadGameView(APIView):
+class UploadGameView(CreateAPIView):
     serializer_class = serializers.UploadGameSerializer
 
-    def post(self, request: Request, slug: str) -> Response:
-        serializer = self.serializer_class(
-            data=request.data,
-            context={'slug': slug},
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(status=status.HTTP_201_CREATED)
+    def get_serializer_context(self) -> dict:
+        return {
+            'slug': self.kwargs['slug'],
+        }
 
 
-class ServeGameView(View):
-    def get(self, request: Request, slug: str, version: int) -> HttpResponse:
-        game = get_object_or_404(Game, slug=slug, version=version)
-        extracted = ZipFile(BytesIO(game.source.read()))
-        index_html = extracted.read('index.html').decode()
-        return HttpResponse(index_html)
+class ServeGameView(DetailView):
+    response_class = HttpResponse
+
+    def get(self, request: Request, *args, **kwargs) -> response_class:
+        version = self.get_object()
+        index_html = self._get_index_html(version)
+        return self.response_class(index_html)
+
+    def get_object(self) -> GameVersion:
+        game = get_object_or_404(Game, slug=self.kwargs['slug'])
+        version = get_object_or_404(GameVersion, game=game, version=self.kwargs['version'])
+
+        return version
+
+    def _get_index_html(self, version: GameVersion) -> bytes:
+        extracted = ZipFile(BytesIO(version.source.read()))
+        return extracted.read('index.html').decode()
 
 
 class ScoreView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, )
+    lookup_field = 'slug'
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         queryset = self.get_queryset()
@@ -107,7 +101,8 @@ class ScoreView(ListCreateAPIView):
         return Response({'scores': serializer.data})
 
     def get_queryset(self) -> QuerySet:
-        return Score.objects.filter(game=self._get_game())
+        game = self._get_game()
+        return Score.objects.filter(game=game)
 
     def get_serializer_context(self) -> dict:
         return {
@@ -116,11 +111,7 @@ class ScoreView(ListCreateAPIView):
         }
 
     def _get_game(self) -> Game:
-        game = Game.objects.filter(slug=self.kwargs['slug']).order_by('-version').last()
-        if not game:
-            raise NotFound('Game not found')
-
-        return game
+        return Game.objects.get(slug=self.kwargs['slug'])
 
     def get_serializer_class(self) -> ScoreSerializer:
         match self.request.method:
