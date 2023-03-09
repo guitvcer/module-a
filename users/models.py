@@ -18,3 +18,6 @@ class User(models.Model):
         null=True, blank=True, verbose_name='Block Reason')
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
+
+    def __str__(self) -> str:
+        return self.username
