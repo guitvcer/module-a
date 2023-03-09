@@ -20,9 +20,14 @@ def block_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: QuerySet)
     queryset.update(is_blocked=True, block_reason=User.BlockReasonChoices.BY_ADMIN)
 
 
+@admin.action(description='Unblock selected users')
+def unblock_users(modeladmin: UserAdmin, request: WSGIRequest, queryset: QuerySet) -> None:
+    queryset.update(is_blocked=False, block_reason=None)
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    actions = (deactivate_users, activate_users, block_users)
+    actions = (deactivate_users, activate_users, block_users, unblock_users)
     exclude = ('password', )
     list_display = (
         'username',
