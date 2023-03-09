@@ -11,9 +11,14 @@ def deactivate_games(modeladmin: UserAdmin, request: WSGIRequest, queryset: Quer
     queryset.update(is_active=False)
 
 
+@admin.action(description='Activate selected games')
+def activate_games(modeladmin: UserAdmin, request: WSGIRequest, queryset: QuerySet) -> None:
+    queryset.update(is_active=True)
+
+
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    actions = (deactivate_games, )
+    actions = (deactivate_games, activate_games)
 
 
 admin.site.register(GameVersion)
