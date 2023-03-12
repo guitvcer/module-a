@@ -9,7 +9,7 @@ class User(models.Model):
         BY_CHEATING = 'You have been blocked for cheating'
         BY_SPAMMING = 'You have been blocked for spamming'
 
-    username = models.CharField(max_length=60, primary_key=True, verbose_name='Username')
+    username = models.CharField(max_length=60, unique=True, verbose_name='Username')
     password = models.CharField(max_length=2**16, verbose_name='Password')
 
     is_active = models.BooleanField(default=True, verbose_name='Is Active?')
