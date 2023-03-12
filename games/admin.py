@@ -35,4 +35,13 @@ class GameVersionAdmin(admin.ModelAdmin):
         return game_version.game.slug
 
 
-admin.site.register(Score)
+@admin.register(Score)
+class ScoreAdmin(admin.ModelAdmin):
+    search_fields = ('id', 'game__id', 'user__id')
+    list_display = ('id', 'game_slug', 'user_username')
+
+    def game_slug(self, score: Score) -> str:
+        return score.game.slug
+
+    def user_username(self, score: Score) -> str:
+        return score.user.username
