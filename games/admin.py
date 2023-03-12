@@ -20,6 +20,7 @@ def activate_games(modeladmin: UserAdmin, request: WSGIRequest, queryset: QueryS
 class GameAdmin(admin.ModelAdmin):
     actions = (deactivate_games, activate_games)
     search_fields = ('title', 'description')
+    list_display = ('id', 'slug', 'is_active', 'is_active', 'created_at')
 
 
 admin.site.register(GameVersion)
