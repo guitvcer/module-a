@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 
@@ -18,7 +20,13 @@ class User(models.Model):
         null=True, blank=True, verbose_name='Block Reason')
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
-    last_login = models.DateTimeField(auto_now=True, verbose_name='Last Login')
+    last_login = models.DateTimeField(verbose_name='Last Login')
 
     def __str__(self) -> str:
         return self.username
+
+    def save(self, *args, **kwargs) -> None:
+        if not self.last_login:
+            self.last_login = datetime.utcnow()
+
+        super().save(*args, **kwargs)
