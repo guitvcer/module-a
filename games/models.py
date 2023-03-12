@@ -42,6 +42,7 @@ class GameVersion(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, verbose_name='Game')
     version = models.PositiveSmallIntegerField(default=1, verbose_name='Version')
     source = models.FileField(upload_to=_get_source_path, verbose_name='Source Code')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
 
 
 class Score(models.Model):
