@@ -5,11 +5,11 @@ from .views import GameViewSet, ScoreView, UploadGameView
 
 app_name = 'games'
 
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=False)
 router.register('', GameViewSet, basename='game')
 
 urlpatterns = [
     *router.urls,
-    path('<slug:slug>/upload/', UploadGameView.as_view(), name='upload'),
-    path('<slug:slug>/scores/', ScoreView.as_view(), name='score'),
+    path('<slug:slug>/upload', UploadGameView.as_view(), name='upload'),
+    path('<slug:slug>/scores', ScoreView.as_view(), name='score'),
 ]
