@@ -116,8 +116,6 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'sortBy',
 }
 
-APPEND_SLASH = False
-
 VERSION = 1
 
 SIMPLE_JWT = {
