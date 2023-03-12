@@ -26,5 +26,13 @@ class GameAdmin(admin.ModelAdmin):
         return game.author.username
 
 
-admin.site.register(GameVersion)
+@admin.register(GameVersion)
+class GameVersionAdmin(admin.ModelAdmin):
+    search_fields = ('version', 'game__id', 'id')
+    list_display = ('id', 'game_slug', 'version')
+
+    def game_slug(self, game_version: GameVersion) -> str:
+        return game_version.game.slug
+
+
 admin.site.register(Score)
