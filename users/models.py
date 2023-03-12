@@ -19,8 +19,14 @@ class User(models.Model):
         max_length=128, choices=BlockReasonChoices.choices,
         null=True, blank=True, verbose_name='Block Reason')
 
-    created_at = models.DateTimeField(default=datetime.utcnow(), verbose_name='Created At')
-    last_login = models.DateTimeField(default=datetime.utcnow(), verbose_name='Last Login')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
+    last_login = models.DateTimeField(verbose_name='Last Login')
 
     def __str__(self) -> str:
         return self.username
+
+    def save(self, *args, **kwargs) -> None:
+        if not self.last_login:
+            self.last_login = datetime.utcnow()
+
+        super().save(*args, **kwargs)
