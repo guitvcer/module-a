@@ -46,7 +46,7 @@ class GameVersion(models.Model):
 
 
 class Score(models.Model):
-    score = models.PositiveSmallIntegerField(verbose_name='Score')
+    score = models.IntegerField(verbose_name='Score')
     game = models.ForeignKey(
         Game, on_delete=models.CASCADE, verbose_name='Game', related_name='scores')
     user = models.ForeignKey(
