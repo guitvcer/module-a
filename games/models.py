@@ -20,6 +20,9 @@ class Game(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
     is_active = models.BooleanField(default=True, verbose_name='Is Active?')
 
+    def __str__(self) -> str:
+        return self.slug
+
     @property
     def last_version(self) -> 'GameVersion | None':
         return GameVersion.objects.filter(game=self).order_by('-version').first()
