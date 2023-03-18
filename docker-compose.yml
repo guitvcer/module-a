@@ -16,6 +16,7 @@ services:
     image: worldskills_module_a
     environment:
       <<: *environment-vars
+    env_file: .env
     volumes:
       - .:/proj
     depends_on:
