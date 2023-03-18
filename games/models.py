@@ -7,7 +7,12 @@ from users.models import User
 class Game(models.Model):
 
     def _directory_path(self, filename: str) -> str:
-        return f'games/{self.slug}/{self.version}/{filename}'
+        if last_version := self.last_version:
+            version = last_version.version
+        else:
+            version = 1
+
+        return f'games/{self.slug}/{version}/{filename}'
 
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Author', related_name='games')
@@ -15,7 +20,7 @@ class Game(models.Model):
     slug = models.SlugField(verbose_name='Slug', unique=True)
     title = models.CharField(max_length=60, verbose_name='Title')
     description = models.CharField(max_length=200, verbose_name='Description')
-    thumbnail = models.ImageField(verbose_name='Thumbnail', null=True)
+    thumbnail = models.ImageField(verbose_name='Thumbnail', null=True, upload_to=_directory_path)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
     is_active = models.BooleanField(default=True, verbose_name='Is Active?')
