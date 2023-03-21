@@ -128,3 +128,5 @@ SIMPLE_JWT = {
 }
 
 ORDER_DIRECTION_PARAM = 'sortDir'
+
+X_FRAME_OPTIONS = os.environ['X_FRAME_OPTIONS']
