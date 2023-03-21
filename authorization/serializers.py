@@ -3,10 +3,11 @@ from datetime import datetime
 import django.db.utils
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import serializers
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from users.models import User
 from . import exceptions
+from .tokens import Token
 
 
 class BaseSignSerializer(serializers.ModelSerializer):
@@ -15,7 +16,7 @@ class BaseSignSerializer(serializers.ModelSerializer):
         self._user.last_login = datetime.utcnow()
         self._user.save()
 
-        refresh_token = RefreshToken.for_user(self._user)
+        refresh_token = Token.for_user(self._user)
         return {
             'status': 'success',
             'token': str(refresh_token),
@@ -59,3 +60,7 @@ class SignInSerializer(BaseSignSerializer):
             return self._user
 
         raise exceptions.InvalidCredentials()
+
+
+class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+    token_class = Token
