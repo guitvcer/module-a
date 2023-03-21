@@ -11,7 +11,7 @@ class GamesOrderingFilter(OrderingFilter):
     def get_ordering(self, request: Request, queryset: QuerySet,
                      view: APIView) -> tuple[str, ...] | list[str]:
 
-        """For uploaddate -> uploadTimestamp map"""
+        """For uploaddate -> uploadTimestamp map"""  # todo fix
 
         params = request.query_params.get(self.ordering_param)
         default_ordering = self.get_default_ordering(view)

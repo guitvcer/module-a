@@ -10,9 +10,6 @@ from . import exceptions
 
 
 class BaseSignSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(min_length=4, max_length=60, required=True)
-    password = serializers.CharField(min_length=8, max_length=2**16, required=True)
-
     @property
     def data(self) -> dict:
         self._user.last_login = datetime.utcnow()
@@ -30,6 +27,9 @@ class BaseSignSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(BaseSignSerializer):
+    username = serializers.CharField(min_length=4, max_length=60, required=True)
+    password = serializers.CharField(min_length=8, max_length=2**16, required=True)
+
     def save(self) -> User:
         username, password = self.validated_data['username'], self.validated_data['password']
         encoded_password = make_password(password)
@@ -42,6 +42,9 @@ class SignUpSerializer(BaseSignSerializer):
 
 
 class SignInSerializer(BaseSignSerializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
+
     def validate(self, data: dict) -> User:
         username, password = data['username'], data['password']
         try:
