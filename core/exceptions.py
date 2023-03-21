@@ -2,6 +2,7 @@ from rest_framework.exceptions import APIException
 
 
 class ValidationError(APIException):
+    status_code = 400
     default_code = 'invalid'
     default_detail = 'Request body is not valid.'
 
