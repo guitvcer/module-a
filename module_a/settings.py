@@ -42,7 +42,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'module_a.urls'
@@ -128,5 +127,3 @@ SIMPLE_JWT = {
 }
 
 ORDER_DIRECTION_PARAM = 'sortDir'
-
-X_FRAME_OPTIONS = os.environ['X_FRAME_OPTIONS']
