@@ -123,6 +123,7 @@ VERSION = 1
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'TOKEN_REFRESH_SERIALIZER': 'authorization.serializers.CustomTokenRefreshSerializer',
 }
 
 ORDER_DIRECTION_PARAM = 'sortDir'
