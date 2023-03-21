@@ -78,6 +78,7 @@ class ListGameSerializer(serializers.ModelSerializer):
 
 class RetrieveGameSerializer(ListGameSerializer):
     game_path = serializers.SerializerMethodField()
+    last_version = serializers.SerializerMethodField()
 
     def get_game_path(self, game: Game) -> str:
         return reverse_lazy('serve', kwargs={
@@ -85,11 +86,17 @@ class RetrieveGameSerializer(ListGameSerializer):
             'version': game.last_version.version,
         })
 
+
+    def get_last_version(self, game: Game) -> int | None:
+        if last_version := game.last_version:
+            return last_version.version
+
     class Meta:
         model = Game
         fields = (
             *_get_game_serializer_fields,
             'game_path',
+            'last_version',
         )
 
 
