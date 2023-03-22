@@ -92,10 +92,7 @@ class ScoreView(ListCreateAPIView):
     def list(self, request: Request, *args, **kwargs) -> Response:
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
-        scores = serializer.data
-        for i in range(10):
-            scores.append(scores[0])
-        return Response({'scores': scores})
+        return Response({'scores': serializer.data})
 
     def get_queryset(self) -> QuerySet:
         game = self._get_game()
