@@ -1,15 +1,20 @@
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Sum
 from rest_framework import serializers
 
-from games.models import Game
+from games.models import Game, Score
 from games.serializers import GetScoreSerializer
 from users.models import User
 
 
 class UserGameSerializer(serializers.ModelSerializer):
+    scores = serializers.SerializerMethodField()
+
+    def get_scores(self, game: Game) -> int:
+        return Score.objects.filter(game=game).aggregate(Sum('score'))['score__sum']
+
     class Meta:
         model = Game
-        fields = ('slug', 'title', 'description')
+        fields = ('slug', 'title', 'description', 'thumbnail', 'scores')
 
 
 class UserSerializer(serializers.ModelSerializer):
