@@ -3,7 +3,7 @@ from zipfile import ZipFile, BadZipFile
 
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Sum
 from django.urls import reverse_lazy
 from rest_framework import serializers
@@ -196,7 +196,22 @@ class GetScoreSerializer(serializers.ModelSerializer):
 
 class CreateScoreSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> "Meta.model":
-        return self.Meta.model.objects.create(**validated_data, **self.context)
+        user, game, score = self.context['user'], self.context['game'], validated_data['score']
+        with transaction.atomic():
+            try:
+                highest_score = Score.objects.select_for_update().get(
+                    user=user, game=game, highest=True)
+            except Score.DoesNotExist:
+                highest = True
+            else:
+                if highest_score.score < score:
+                    highest = True
+                    highest_score.highest = False
+                    highest_score.save()
+                else:
+                    highest = False
+
+            return Score.objects.create(user=user, game=game, score=score, highest=highest)
 
     @property
     def data(self):
