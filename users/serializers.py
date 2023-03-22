@@ -9,7 +9,7 @@ from users.models import User
 class UserGameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
-        fields = ('slug', 'title', 'description')
+        fields = ('slug', 'title', 'description', 'thumbnail')
 
 
 class UserSerializer(serializers.ModelSerializer):
