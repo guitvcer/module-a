@@ -96,7 +96,7 @@ class ScoreView(ListCreateAPIView):
 
     def get_queryset(self) -> QuerySet:
         game = self._get_game()
-        return Score.objects.filter(game=game)
+        return Score.objects.filter(game=game).order_by('-score')
 
     def get_serializer_context(self) -> dict:
         return {
