@@ -86,7 +86,6 @@ class RetrieveGameSerializer(ListGameSerializer):
             'version': game.last_version.version,
         })
 
-
     def get_last_version(self, game: Game) -> int | None:
         if last_version := game.last_version:
             return last_version.version
