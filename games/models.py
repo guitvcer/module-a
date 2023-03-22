@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.text import slugify
 
 from users.models import User
@@ -56,4 +57,14 @@ class Score(models.Model):
         Game, on_delete=models.CASCADE, verbose_name='Game', related_name='scores')
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='User', related_name='scores')
+    highest = models.BooleanField(verbose_name='Highest?')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=('game_id', 'user_id'),
+                condition=Q(highest=True),
+                name='unique_highest_game_score_per_player',
+            ),
+        )
