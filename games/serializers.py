@@ -198,6 +198,12 @@ class CreateScoreSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> "Meta.model":
         return self.Meta.model.objects.create(**validated_data, **self.context)
 
+    @property
+    def data(self):
+        return {
+            'status': 'success',
+        }
+
     class Meta:
         model = Score
         fields = ('score', )
