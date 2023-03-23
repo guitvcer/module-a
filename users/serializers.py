@@ -23,11 +23,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     authored_games = serializers.SerializerMethodField()
 
-    def get_authored_games(self, instance: User) -> QuerySet:
+    def get_authored_games(self, user: User) -> QuerySet:
         filters = {
-            'author': self.context['user'],
+            'author': user,
         }
-        if self.context['user'] != instance:
+        current_user = self.context['user']
+        if current_user != user:
             filters['gameversion__version__gte'] = 1
 
         games = Game.objects.filter(**filters)
