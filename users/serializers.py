@@ -28,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
             'author': self.context['user'],
         }
         if self.context['user'] != instance:
-            filters['version__gte'] = 1
+            filters['gameversion__version__gte'] = 1
 
         games = Game.objects.filter(**filters)
         serializer = UserGameSerializer(games, many=True)
