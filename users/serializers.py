@@ -2,7 +2,6 @@ from django.db.models import QuerySet, Sum
 from rest_framework import serializers
 
 from games.models import Game, Score
-from games.serializers import GetScoreSerializer
 from users.models import User
 
 
@@ -17,9 +16,24 @@ class UserGameSerializer(serializers.ModelSerializer):
         fields = ('slug', 'title', 'description', 'thumbnail', 'scores')
 
 
+class GameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Game
+        fields = ('slug', 'title', 'description')
+
+
+class ScoreSerializer(serializers.ModelSerializer):
+    game = GameSerializer()
+    timestamp = serializers.DateTimeField(source='created_at')
+
+    class Meta:
+        model = Score
+        fields = ('score', 'timestamp', 'game')
+
+
 class UserSerializer(serializers.ModelSerializer):
     registered_timestamp = serializers.DateTimeField(source='created_at')
-    highscores = GetScoreSerializer(many=True, source='scores')
+    highscores = ScoreSerializer(many=True, source='scores')
 
     authored_games = serializers.SerializerMethodField()
 
