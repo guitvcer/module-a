@@ -50,6 +50,9 @@ class GameVersion(models.Model):
     source = models.FileField(upload_to=_get_source_path, verbose_name='Source Code')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
 
+    class Meta:
+        unique_together = ('game', 'version')
+
 
 class Score(models.Model):
     score = models.IntegerField(verbose_name='Score')
