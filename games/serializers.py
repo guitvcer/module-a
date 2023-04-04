@@ -1,6 +1,7 @@
 import io
 from zipfile import ZipFile, BadZipFile
 
+from django.conf import settings
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import IntegrityError, transaction
@@ -122,6 +123,9 @@ class UploadGameSerializer(serializers.Serializer):
         return attrs
 
     def _validate_zipfile(self, zipfile: InMemoryUploadedFile) -> None:
+        if zipfile.size > settings.MAX_GAME_SOURCE_SIZE:
+            raise ValidationError('ZIP file is too big.')
+
         try:
             extracted = ZipFile(zipfile)
         except BadZipFile:
