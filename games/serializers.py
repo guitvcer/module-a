@@ -131,10 +131,13 @@ class UploadGameSerializer(serializers.Serializer):
         if 'index.html' not in file_names:
             raise ValidationError('The ZIP file must at least contain an index.html file.')
 
+        thumbnail = None
         if 'thumbnail.png' in file_names:
             thumbnail = extracted.read('thumbnail.png')
             thumbnail = io.BytesIO(thumbnail)
-            self._thumbnail = File(thumbnail, name='thumbnail.png')
+            thumbnail = File(thumbnail, name='thumbnail.png')
+
+        self._thumbnail = thumbnail
 
     def _validate_token(self, token: str) -> None:
         auth = Authentication()
